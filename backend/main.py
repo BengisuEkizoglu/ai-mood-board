@@ -103,16 +103,56 @@ class MoodBoardResponse(BaseModel):
     inspiration_text: str
     mood_analysis: dict
 
-# Color palettes for different moods
+# Color palettes for different moods with variations
 MOOD_COLORS = {
-    "romantic": ["#FF6B9D", "#FFB3D1", "#FFE5F1", "#8B5A96", "#4A4A4A"],
-    "peaceful": ["#87CEEB", "#98FB98", "#F0E68C", "#DDA0DD", "#F5F5DC"],
-    "energetic": ["#FF4500", "#FFD700", "#32CD32", "#4169E1", "#FF1493"],
-    "melancholic": ["#2F4F4F", "#696969", "#708090", "#B0C4DE", "#E6E6FA"],
-    "nature": ["#228B22", "#8FBC8F", "#F4A460", "#DEB887", "#CD853F"],
-    "urban": ["#708090", "#2F4F4F", "#FF6347", "#FFD700", "#4169E1"],
-    "vintage": ["#8B4513", "#DEB887", "#F4A460", "#D2B48C", "#CD853F"],
-    "modern": ["#000000", "#FFFFFF", "#808080", "#C0C0C0", "#FF6B35"]
+    "romantic": [
+        ["#FF6B9D", "#FFB3D1", "#FFE5F1", "#8B5A96", "#4A4A4A"],
+        ["#FF1493", "#FF69B4", "#FFB6C1", "#C71585", "#DB7093"],
+        ["#FF007F", "#FF69B4", "#FFC0CB", "#DC143C", "#FF1493"],
+        ["#FF69B4", "#FFB6C1", "#FFC0CB", "#FF1493", "#C71585"]
+    ],
+    "peaceful": [
+        ["#87CEEB", "#98FB98", "#F0E68C", "#DDA0DD", "#F5F5DC"],
+        ["#B0E0E6", "#98FB98", "#F0E68C", "#DDA0DD", "#F0F8FF"],
+        ["#ADD8E6", "#90EE90", "#F0E68C", "#DDA0DD", "#F5F5DC"],
+        ["#87CEEB", "#98FB98", "#F0E68C", "#E6E6FA", "#F0F8FF"]
+    ],
+    "energetic": [
+        ["#FF4500", "#FFD700", "#32CD32", "#4169E1", "#FF1493"],
+        ["#FF6347", "#FFD700", "#00FF00", "#1E90FF", "#FF1493"],
+        ["#FF4500", "#FFFF00", "#00FF7F", "#4169E1", "#FF1493"],
+        ["#FF6347", "#FFD700", "#32CD32", "#1E90FF", "#FF1493"]
+    ],
+    "melancholic": [
+        ["#2F4F4F", "#696969", "#708090", "#B0C4DE", "#E6E6FA"],
+        ["#4A4A4A", "#696969", "#708090", "#B0C4DE", "#F0F8FF"],
+        ["#2F4F4F", "#696969", "#778899", "#B0C4DE", "#E6E6FA"],
+        ["#4A4A4A", "#696969", "#708090", "#C0C0C0", "#F0F8FF"]
+    ],
+    "nature": [
+        ["#228B22", "#8FBC8F", "#F4A460", "#DEB887", "#CD853F"],
+        ["#32CD32", "#90EE90", "#F4A460", "#DEB887", "#D2691E"],
+        ["#228B22", "#98FB98", "#F4A460", "#DEB887", "#CD853F"],
+        ["#32CD32", "#8FBC8F", "#F4A460", "#D2B48C", "#CD853F"]
+    ],
+    "urban": [
+        ["#708090", "#2F4F4F", "#FF6347", "#FFD700", "#4169E1"],
+        ["#696969", "#2F4F4F", "#FF6347", "#FFD700", "#1E90FF"],
+        ["#708090", "#4A4A4A", "#FF6347", "#FFFF00", "#4169E1"],
+        ["#696969", "#2F4F4F", "#FF4500", "#FFD700", "#1E90FF"]
+    ],
+    "vintage": [
+        ["#8B4513", "#DEB887", "#F4A460", "#D2B48C", "#CD853F"],
+        ["#A0522D", "#DEB887", "#F4A460", "#D2B48C", "#D2691E"],
+        ["#8B4513", "#F5DEB3", "#F4A460", "#D2B48C", "#CD853F"],
+        ["#A0522D", "#DEB887", "#F4A460", "#F5DEB3", "#CD853F"]
+    ],
+    "modern": [
+        ["#000000", "#FFFFFF", "#808080", "#C0C0C0", "#FF6B35"],
+        ["#2F2F2F", "#FFFFFF", "#808080", "#C0C0C0", "#FF6347"],
+        ["#000000", "#F5F5F5", "#808080", "#C0C0C0", "#FF6B35"],
+        ["#2F2F2F", "#FFFFFF", "#696969", "#C0C0C0", "#FF6347"]
+    ]
 }
 
 def analyze_mood_with_ai(description: str) -> dict:
@@ -226,20 +266,31 @@ def analyze_mood_fallback(description: str) -> dict:
         "color_palette": detected_mood
     }
 
-def generate_multiple_images(keywords: List[str], count: int = 5) -> List[dict]:
-    """Generates multiple images using local Stable Diffusion or themed images"""
+def generate_multiple_images_with_colors(keywords: List[str], color_palette: List[str], count: int = 5) -> List[dict]:
+    """Generates multiple images using local Stable Diffusion with color palette integration"""
     try:
         images = []
         search_query = " ".join(keywords[:3]) if keywords else "inspiration"
         
+        # Convert hex colors to color names for better prompt generation
+        color_names = []
+        for color in color_palette:
+            color_name = get_color_name(color)
+            if color_name:
+                color_names.append(color_name)
+        
+        # Create more effective color-enhanced prompts
+        primary_colors = color_names[:2] if len(color_names) >= 2 else color_names
+        color_description = ", ".join(primary_colors) if primary_colors else ""
+        
         for i in range(count):
-            # Add variety to prompts
+            # Add variety to prompts with better color integration
             prompt_variations = [
-                f"{search_query}, beautiful, high quality",
-                f"{search_query}, artistic, creative",
-                f"{search_query}, inspiring, detailed",
-                f"{search_query}, aesthetic, masterpiece",
-                f"{search_query}, elegant, professional"
+                f"{search_query}, {color_description} color theme, soft lighting, beautiful, high quality",
+                f"{search_query}, {color_description} color palette, warm atmosphere, artistic, creative",
+                f"{search_query}, {color_description} color scheme, natural lighting, inspiring, detailed",
+                f"{search_query}, {color_description} color tones, ambient lighting, aesthetic, masterpiece",
+                f"{search_query}, {color_description} color harmony, golden hour lighting, elegant, professional"
             ]
             
             prompt = prompt_variations[i % len(prompt_variations)]
@@ -280,6 +331,73 @@ def generate_multiple_images(keywords: List[str], count: int = 5) -> List[dict]:
             }
             for i in range(count)
         ]
+
+def get_color_name(hex_color: str) -> str:
+    """Convert hex color to color name for better prompt generation"""
+    # Enhanced color mapping for better AI understanding
+    color_map = {
+        # Primary colors
+        "#FF0000": "red", "#00FF00": "green", "#0000FF": "blue",
+        "#FFFF00": "yellow", "#FF00FF": "magenta", "#00FFFF": "cyan",
+        
+        # Warm colors
+        "#FFA500": "orange", "#FF6347": "coral", "#FF4500": "orange red",
+        "#FFD700": "golden", "#FF69B4": "pink", "#FFC0CB": "light pink",
+        "#A52A2A": "brown", "#8B4513": "saddle brown",
+        
+        # Cool colors
+        "#800080": "purple", "#8A2BE2": "blue violet", "#4169E1": "royal blue",
+        "#87CEEB": "sky blue", "#B0E0E6": "powder blue", "#20B2AA": "light sea green",
+        "#32CD32": "lime green", "#98FB98": "pale green",
+        
+        # Neutral colors
+        "#000000": "black", "#FFFFFF": "white", "#808080": "gray",
+        "#C0C0C0": "silver", "#F5F5DC": "beige", "#F0E68C": "khaki",
+        "#DDA0DD": "plum", "#F0F8FF": "alice blue"
+    }
+    
+    # Normalize hex color (remove # if present)
+    hex_color = hex_color.upper()
+    if hex_color.startswith('#'):
+        hex_color = hex_color[1:]
+    
+    # Add # back for lookup
+    hex_color = f"#{hex_color}"
+    
+    # Try exact match first
+    if hex_color in color_map:
+        return color_map[hex_color]
+    
+    # If no exact match, try to find closest color by RGB distance
+    try:
+        # Convert hex to RGB
+        r = int(hex_color[1:3], 16)
+        g = int(hex_color[3:5], 16)
+        b = int(hex_color[5:7], 16)
+        
+        # Find closest color by RGB distance
+        min_distance = float('inf')
+        closest_color = ""
+        
+        for hex_key, color_name in color_map.items():
+            if hex_key.startswith('#'):
+                r2 = int(hex_key[1:3], 16)
+                g2 = int(hex_key[3:5], 16)
+                b2 = int(hex_key[5:7], 16)
+                
+                distance = ((r - r2) ** 2 + (g - g2) ** 2 + (b - b2) ** 2) ** 0.5
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_color = color_name
+        
+        return closest_color if min_distance < 100 else ""  # Threshold for similarity
+        
+    except:
+        return ""
+
+def generate_multiple_images(keywords: List[str], count: int = 5) -> List[dict]:
+    """Legacy function for backward compatibility"""
+    return generate_multiple_images_with_colors(keywords, [], count)
 
 def generate_ai_image(prompt: str, style: str = "realistic") -> dict:
     """Generates AI image with local Stable Diffusion"""
@@ -391,11 +509,13 @@ async def analyze_mood(request: MoodRequest):
         # AI mood analysis
         mood_analysis = analyze_mood_with_ai(request.description)
         
-        # Image suggestions
-        images = generate_multiple_images(mood_analysis["keywords"])
+        # Color palette - randomly select from available variations
+        # Use mood field instead of color_palette field for dictionary lookup
+        mood_palettes = MOOD_COLORS.get(mood_analysis["mood"], MOOD_COLORS["modern"])
+        color_palette = random.choice(mood_palettes)
         
-        # Color palette
-        color_palette = MOOD_COLORS.get(mood_analysis["color_palette"], MOOD_COLORS["modern"])
+        # Image suggestions with color palette integration
+        images = generate_multiple_images_with_colors(mood_analysis["keywords"], color_palette)
         
         return MoodBoardResponse(
             images=images,
@@ -437,6 +557,98 @@ async def save_board(board_data: dict):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Save error: {str(e)}")
+
+@app.get("/api/example-prompts")
+async def get_example_prompts():
+    """Get AI-generated example prompts"""
+    try:
+        # Generate different example prompts based on current time/randomness
+        import time
+        current_time = int(time.time())
+        
+        # Different prompt categories
+        prompt_categories = [
+            {
+                "romantic": [
+                    "I want to feel the magic of a candlelit dinner in Paris",
+                    "Looking for inspiration for a romantic wedding theme",
+                    "Create a mood board for a cozy date night at home",
+                    "I want to capture the feeling of a sunset beach walk",
+                    "Design inspiration for a romantic garden party"
+                ],
+                "peaceful": [
+                    "I need a calming meditation space design",
+                    "Looking for peaceful nature retreat inspiration",
+                    "Create a serene bedroom atmosphere",
+                    "I want to feel the tranquility of a mountain lake",
+                    "Design a peaceful home office environment"
+                ],
+                "energetic": [
+                    "I want to capture the energy of a music festival",
+                    "Looking for dynamic workout space inspiration",
+                    "Create a vibrant party atmosphere",
+                    "I want to feel the excitement of a sports event",
+                    "Design an energetic children's playroom"
+                ],
+                "nature": [
+                    "I want to bring the forest into my living room",
+                    "Looking for ocean-inspired design elements",
+                    "Create a garden oasis in my backyard",
+                    "I want to feel connected to mountain landscapes",
+                    "Design a nature-themed workspace"
+                ],
+                "urban": [
+                    "I want to capture the energy of a modern city",
+                    "Looking for industrial loft design inspiration",
+                    "Create a contemporary urban apartment feel",
+                    "I want to feel the rhythm of downtown life",
+                    "Design a sleek modern office space"
+                ],
+                "vintage": [
+                    "I want to recreate the charm of the 1950s",
+                    "Looking for retro diner aesthetic inspiration",
+                    "Create a vintage photography studio feel",
+                    "I want to feel the nostalgia of old Hollywood",
+                    "Design a classic vintage kitchen"
+                ],
+                "modern": [
+                    "I want a minimalist Scandinavian design",
+                    "Looking for clean modern architecture inspiration",
+                    "Create a sleek contemporary living space",
+                    "I want to feel the simplicity of modern art",
+                    "Design a futuristic smart home environment"
+                ]
+            }
+        ]
+        
+        # Select a random category and get 5 prompts
+        selected_category = random.choice(list(prompt_categories[0].keys()))
+        category_prompts = prompt_categories[0][selected_category]
+        
+        # Shuffle and select 5 unique prompts
+        random.shuffle(category_prompts)
+        selected_prompts = category_prompts[:5]
+        
+        return {
+            "prompts": selected_prompts,
+            "category": selected_category,
+            "timestamp": current_time
+        }
+        
+    except Exception as e:
+        # Fallback to static prompts if AI generation fails
+        fallback_prompts = [
+            "I want to feel like walking in the streets of Paris in autumn",
+            "Looking for inspiration for a minimalist and modern office design",
+            "I want to create a romantic dinner atmosphere",
+            "A peaceful living space concept in harmony with nature",
+            "An energetic and dynamic gym design"
+        ]
+        return {
+            "prompts": fallback_prompts,
+            "category": "mixed",
+            "timestamp": int(time.time())
+        }
 
 @app.get("/api/health")
 async def health_check():
