@@ -26,7 +26,7 @@ AI-powered creative mood board creation application. Analyzes user emotions and 
 - Node.js 16+
 - CUDA-compatible GPU (optional, for faster image generation)
 - 8GB+ RAM (for local AI models)
-- Ollama (optional, for local text analysis)
+- Ollama (for local text analysis)
 
 ### Installation
 
@@ -73,7 +73,7 @@ The application will be available at:
 ### Backend
 - **FastAPI**: Modern Python web framework
 - **Local Stable Diffusion**: AI image generation with CUDA support
-- **Ollama Qwen**: Local AI text analysis (optional)
+- **Ollama Qwen**: Local AI text analysis
 - **PyTorch**: Deep learning framework
 - **Diffusers**: HuggingFace diffusion models
 - **Smart Fallback**: Themed image generation with Picsum
