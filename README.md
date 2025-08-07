@@ -7,6 +7,9 @@
 
 AI-powered creative mood board creation application. Analyzes user emotions and mood to create visual inspiration boards with local AI image generation.
 
+<img width="1199" height="550" alt="Screenshot from 2025-08-07 16-13-45" src="https://github.com/user-attachments/assets/b24038b9-f36f-4806-acaf-3d8c3f9995a1" />
+<img width="1323" height="627" alt="Screenshot from 2025-08-07 16-14-04" src="https://github.com/user-attachments/assets/95846cca-06c9-43e7-99fa-978c1181d1a1" />
+
 ## ✨ Features
 
 - 🤖 **AI Mood Analysis**: Analyzes user input with intelligent keyword detection
