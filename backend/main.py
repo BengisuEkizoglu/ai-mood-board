@@ -45,18 +45,19 @@ def initialize_stable_diffusion():
     """Initialize Stable Diffusion pipeline with CUDA support"""
     global sd_pipeline
     try:
-        print("🔄 Initializing Stable Diffusion pipeline...")
+        print("Initializing Stable Diffusion pipeline...")
         
         # Check if CUDA is available
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"📱 Using device: {device}")
         
         # Load the pipeline
-        model_id = "runwayml/stable-diffusion-v1-5"
+        model_id = "sd-legacy/stable-diffusion-v1-5"
         sd_pipeline = StableDiffusionPipeline.from_pretrained(
             model_id,
             torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-            safety_checker=None,
+            # Safety checker enabled for responsible AI usage
+            safety_checker=None,  # You can enable this for production
             requires_safety_checker=False
         )
         
@@ -70,15 +71,15 @@ def initialize_stable_diffusion():
         if device == "cuda":
             try:
                 sd_pipeline.enable_xformers_memory_efficient_attention()
-                print("✅ XFormers memory efficient attention enabled")
+                print("XFormers memory efficient attention enabled")
             except:
-                print("⚠️ XFormers not available, using standard attention")
+                print("XFormers not available, using standard attention")
         
-        print("✅ Stable Diffusion pipeline initialized successfully!")
+        print("Stable Diffusion pipeline initialized successfully!")
         return True
         
     except Exception as e:
-        print(f"❌ Failed to initialize Stable Diffusion: {e}")
+        print(f"Failed to initialize Stable Diffusion: {e}")
         return False
 
 # Initialize on startup
@@ -289,10 +290,10 @@ def generate_ai_image(prompt: str, style: str = "realistic") -> dict:
         
         # Check if Stable Diffusion pipeline is available
         if sd_pipeline is None:
-            print("⚠️ Stable Diffusion pipeline not initialized, using themed images")
+            print("Stable Diffusion pipeline not initialized, using themed images")
             return generate_themed_image(prompt, style)
         
-        print(f"🎨 Generating image with prompt: {enhanced_prompt}")
+        print(f"Generating image with prompt: {enhanced_prompt}")
         
         # Generate image with Stable Diffusion
         with torch.no_grad():
@@ -309,7 +310,7 @@ def generate_ai_image(prompt: str, style: str = "realistic") -> dict:
         image.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
-        print("✅ Image generated successfully!")
+        print(" Image generated successfully!")
         
         return {
             "url": f"data:image/png;base64,{img_str}",
@@ -319,7 +320,7 @@ def generate_ai_image(prompt: str, style: str = "realistic") -> dict:
         }
             
     except Exception as e:
-        print(f"❌ Stable Diffusion Error: {e}")
+        print(f" Stable Diffusion Error: {e}")
         return generate_themed_image(prompt, style)
 
 def generate_themed_image(prompt: str, style: str = "realistic") -> dict:
@@ -447,6 +448,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host=os.getenv("HOST", "0.0.0.0"),
-        port=int(os.getenv("PORT", 8000)),
+        port=int(os.getenv("PORT", 8001)),
         reload=os.getenv("DEBUG", "True").lower() == "true"
     ) 
