@@ -41,9 +41,10 @@ cd ai-mood-board
 cd backend
 pip install -r requirements.txt
 cp env.example .env
-# Optional: Install Ollama for local AI text analysis
-# curl -fsSL https://ollama.ai/install.sh | sh
-# ollama pull qwen2.5:7b
+
+# Install Ollama for local AI text analysis
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull qwen2.5:7b
 ```
 
 3. **Frontend setup**
